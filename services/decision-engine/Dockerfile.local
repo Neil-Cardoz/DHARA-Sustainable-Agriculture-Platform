@@ -1,0 +1,22 @@
+# Local-dev-only image: runs local_runner.py (plain Python loops) instead of the
+# Azure Functions host, so `docker compose up` doesn't require Functions Core Tools.
+# The real deployment uses function_app.py via `func azure functionapp publish`
+# (see docs/SETUP.md) -- this file is never used in production.
+FROM python:3.12-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential curl \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY packages/dhara_shared /app/packages/dhara_shared
+COPY services/decision-engine/requirements.txt /app/services/decision-engine/requirements.txt
+
+RUN pip install --no-cache-dir -e /app/packages/dhara_shared \
+    && pip install --no-cache-dir -r /app/services/decision-engine/requirements.txt \
+    && pip install --no-cache-dir azure-functions
+
+COPY services/decision-engine/*.py /app/services/decision-engine/
+
+WORKDIR /app/services/decision-engine
+CMD ["python", "local_runner.py"]

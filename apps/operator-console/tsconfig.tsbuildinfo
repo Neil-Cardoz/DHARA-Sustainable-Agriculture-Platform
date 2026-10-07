@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/lib/clustercontext.tsx","./src/lib/api.ts","./src/pages/advisorypage.tsx","./src/pages/dashboardpage.tsx","./src/pages/energypage.tsx","./src/pages/ledgerpage.tsx","./src/pages/plotdetailpage.tsx","./src/pages/plotspage.tsx","./src/pages/storagepage.tsx"],"version":"5.9.3"}

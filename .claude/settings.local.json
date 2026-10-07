@@ -1,0 +1,5 @@
+{
+  "enabledPlugins": {
+    "azure@claude-plugins-official": true
+  }
+}

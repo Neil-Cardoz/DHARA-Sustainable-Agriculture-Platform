@@ -1,0 +1,61 @@
+version: "3.9"
+
+# Local development stack. Talks to REAL Azure services (IoT Hub, OpenAI, Speech,
+# Communication Services) via the connection strings in .env -- only Postgres runs
+# locally. See docs/SETUP.md for the full local dev walkthrough.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: dhara_admin
+      POSTGRES_PASSWORD: local_dev_only
+      POSTGRES_DB: dhara
+    ports:
+      - "5432:5432"
+    volumes:
+      - dhara_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dhara_admin -d dhara"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: services/api/Dockerfile
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://dhara_admin:local_dev_only@postgres:5432/dhara
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  decision-engine:
+    build:
+      context: .
+      dockerfile: services/decision-engine/Dockerfile.local
+    env_file: .env
+    environment:
+      API_BASE_URL: http://api:8000
+      ADVISORY_BOT_URL: http://advisory-bot:8100
+    depends_on:
+      - api
+
+  advisory-bot:
+    build:
+      context: .
+      dockerfile: services/advisory-bot/Dockerfile
+    env_file: .env
+    environment:
+      API_BASE_URL: http://api:8000
+    ports:
+      - "8100:8100"
+    depends_on:
+      - api
+
+volumes:
+  dhara_pg_data:

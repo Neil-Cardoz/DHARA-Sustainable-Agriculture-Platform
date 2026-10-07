@@ -1,0 +1,29 @@
+# Secrets -- never commit
+.env
+.secrets/
+services/edge-simulator/devices.json
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+
+# Node
+node_modules/
+apps/operator-console/dist/
+
+# Azure Functions
+services/*/local.settings.json
+services/*/.python_packages/
+services/*/bin/
+services/*/obj/
+
+# OS
+.DS_Store
+Thumbs.db
